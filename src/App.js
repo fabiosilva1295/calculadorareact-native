@@ -29,13 +29,18 @@ export default class App extends Component {
       if(this.state.displayValue.length < 2 && dig != "." && this.state.displayValue == "0"){
         this.setState({displayValue: this.state.displayValue = dig})
       }else {
-        if(dig == "." && this.state.displayValue.includes(dig)){
-          if(!!this.isValidOperation() && this.state.operation > 0){
+        if(dig == "." && this.state.displayValue.includes(dig) ){
+          if(this.isValidOperation() && this.state.operation > 0){
             this.setState({displayValue: this.state.displayValue += dig})
           }else{
             false
           }
-          
+        }else if(dig == "." && !this.state.displayValue.includes(dig)){
+          if(this.isValidOperation()){
+            this.setState({displayValue: this.state.displayValue += dig})
+          }else{
+            false
+          }
         }else {
           if(this.state.displayValue == 'error' || this.state.displayValue == 'Infinity'){
             this.setState({displayValue: this.state.displayValue = dig})
@@ -56,11 +61,11 @@ export default class App extends Component {
     
     if(dig === "del" ){
       if(this.state.displayValue.length < 2 && this.state.displayValue === "0") {
-        false
+        return false;
       }else if(this.state.displayValue.length < 2 && this.state.displayValue !== "0"){
-        this.setState(this.initialState)
+        this.setState(this.initialState);
       }else if (this.state.displayValue == 'error' || this.state.displayValue == 'Infinity'){
-        return false
+        return false;
       }else{
         if(this.state.displayValue[this.state.displayValue.length - 1] == ")"){
 
@@ -97,15 +102,15 @@ export default class App extends Component {
       this.setState({
 
         displayValue: this.state.displayValue += "(",
-        parentheses: "open"})
+        parentheses: "open"});
         
-    } else if(!!this.isValidOperation && !this.state.displayValue.includes("(") && this.state.displayValue != "0"){
+    } else if(this.isValidOperation() && !this.state.displayValue.includes("(") && this.state.displayValue != "0"){
 
       this.setState({
         displayValue: this.state.displayValue += "*(",
         parentheses: "open"});
 
-    }else if( this.state.parentheses === "open" && !this.isValidOperation()){
+    }else if( this.state.parentheses === "open" && this.isValidOperation()){
       this.setState({
         displayValue: this.state.displayValue += ")",
         parentheses: "close"
@@ -118,7 +123,7 @@ export default class App extends Component {
       if(this.state.displayValue === 'error' ){
         false
       }else{
-        if(!!this.isValidOperation() ){
+        if(this.isValidOperation() && this.state.parentheses != "open"){
           res = eval(this.state.displayValue);
           if(isNaN(res)){
           this.setState({displayValue: "error"});
@@ -145,13 +150,19 @@ export default class App extends Component {
     if(invalidTermialString.includes(this.state.displayValue[this.state.displayValue.length - 1])){
       return false;
 
-    }else if (this.state.displayValue[this.state.displayValue.length - 2] == "("){
-      return true
+    }else if (this.state.displayValue.includes("(") && this.state.parentheses == "open"){
+      return true;
     }else {
       if(this.state.displayValue.includes("(") && !this.state.displayValue.includes(")") ){
         return false;
       }
       return true;
+    }
+  }
+
+ transformToNegativeNumber = ()=> {
+    if(this.isValidOperation()){
+     
     }
   }
 
@@ -166,7 +177,7 @@ export default class App extends Component {
         <View style={style.buttoncontainer}>
           <Button onClick={() => this.clearMemory()} ac label="AC"></Button>
           <Button onClick={() => this.setParentheses("")} especial label="( ... )"></Button>
-          <Button onClick={() => this.setOperation("")} especial label="%"></Button>
+          <Button onClick={() => this.transformToNegativeNumber("")} especial label="+/-"></Button>
           <Button onClick={() => this.setOperation("/")} operation label="/"></Button>
           <Button onClick={() => this.addDig("7")} label="7"></Button>
           <Button onClick={() => this.addDig("8")} label="8"></Button>
