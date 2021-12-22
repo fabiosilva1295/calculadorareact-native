@@ -11,13 +11,13 @@ export default class App extends Component {
   state = {
     displayValue: "0",
     displayHistory: "0",
-    precedentes: "none"
+    parentheses: "none"
   }
 
   initialState = {
     displayValue: "0",
     displayHistory: "0",
-    precedentes: "none"
+    parentheses: "none"
   }
 
   addDig  = dig => {
@@ -52,7 +52,15 @@ export default class App extends Component {
       }else if(this.state.displayValue.length < 2 && this.state.displayValue !== "0"){
         this.setState(this.initialState)
       }else{
-        this.setState({displayValue: this.state.displayValue.slice(0, -1) })
+        if(this.state.displayValue[this.state.displayValue.length - 1] == ")"){
+
+          this.setState({
+            displayValue: this.state.displayValue.slice(0, -1), 
+            parentheses: "open"
+          })
+        }else {
+          this.setState({displayValue: this.state.displayValue.slice(0, -1)})
+        }
       }
     }else {
       this.setState(this.initialState)
@@ -67,6 +75,28 @@ export default class App extends Component {
       this.setState({displayValue: this.state.displayValue += digOperation})
     }
     
+  }
+
+  setParentheses = () => {
+
+    if(!this.isValidOperation() && !this.state.displayValue.includes("(")){
+      this.setState({
+
+        displayValue: this.state.displayValue += "(",
+        parentheses: "open"})
+        
+    } else if(!!this.isValidOperation && !this.state.displayValue.includes("(") && this.state.displayValue != "0"){
+
+      this.setState({
+        displayValue: this.state.displayValue += "*(",
+        parentheses: "open"})
+
+    }else if( this.state.parentheses === "open" && !this.isValidOperation()){
+      this.setState({
+        displayValue: this.state.displayValue += ")",
+        parentheses: "close"
+      })
+    }
   }
 
   calculate = () => {
@@ -101,6 +131,9 @@ export default class App extends Component {
     if(invalidTermialString.includes(this.state.displayValue[this.state.displayValue.length - 1])){
       return false
     }else {
+      if(this.state.displayValue.includes("(") && !this.state.displayValue.includes(")")){
+        return false
+      }
       return true
     }
   }
@@ -115,7 +148,7 @@ export default class App extends Component {
         </View>
         <View style={style.buttoncontainer}>
           <Button onClick={() => this.clearMemory()} ac label="AC"></Button>
-          <Button onClick={() => this.setOperation("")} especial label="+/-"></Button>
+          <Button onClick={() => this.setParentheses("")} especial label="( ... )"></Button>
           <Button onClick={() => this.setOperation("")} especial label="%"></Button>
           <Button onClick={() => this.setOperation("/")} operation label="/"></Button>
           <Button onClick={() => this.addDig("7")} label="7"></Button>
