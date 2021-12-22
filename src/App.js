@@ -11,23 +11,31 @@ export default class App extends Component {
   state = {
     displayValue: "0",
     displayHistory: "0",
-    parentheses: "none"
+    parentheses: "none",
+    operation: 0
   }
 
   initialState = {
     displayValue: "0",
     displayHistory: "0",
-    parentheses: "none"
+    parentheses: "none",
+    operation: 0
   }
 
   addDig  = dig => {
    
-    if(this.state.displayValue.length < 9){
+    if(this.state.displayValue.length < 20 ){
+
       if(this.state.displayValue.length < 2 && dig != "." && this.state.displayValue == "0"){
         this.setState({displayValue: this.state.displayValue = dig})
       }else {
         if(dig == "." && this.state.displayValue.includes(dig)){
-          false
+          if(!!this.isValidOperation() && this.state.operation > 0){
+            this.setState({displayValue: this.state.displayValue += dig})
+          }else{
+            false
+          }
+          
         }else {
           if(this.state.displayValue == 'error' || this.state.displayValue == 'Infinity'){
             this.setState({displayValue: this.state.displayValue = dig})
@@ -51,28 +59,34 @@ export default class App extends Component {
         false
       }else if(this.state.displayValue.length < 2 && this.state.displayValue !== "0"){
         this.setState(this.initialState)
+      }else if (this.state.displayValue == 'error' || this.state.displayValue == 'Infinity'){
+        return false
       }else{
         if(this.state.displayValue[this.state.displayValue.length - 1] == ")"){
 
           this.setState({
             displayValue: this.state.displayValue.slice(0, -1), 
             parentheses: "open"
-          })
+          });
+
         }else {
-          this.setState({displayValue: this.state.displayValue.slice(0, -1)})
+          this.setState({displayValue: this.state.displayValue.slice(0, -1)});
         }
       }
     }else {
-      this.setState(this.initialState)
+      this.setState(this.initialState);
     }
   }
 
   setOperation = digOperation => {
-    let invalidStartString = ["*", "/", "(", "+", "-"]
+    let invalidStartString = ["*", "/", "(", "+", "-", ];
     if(this.state.displayValue == 'error' || this.state.displayValue == 'Infinity'){
-      return false
+      return false;
     }else{
-      this.setState({displayValue: this.state.displayValue += digOperation})
+      if(this.isValidOperation()){
+        this.setState({displayValue: this.state.displayValue += digOperation, operation: this.state.operation+= 1});
+      }
+      
     }
     
   }
@@ -89,13 +103,13 @@ export default class App extends Component {
 
       this.setState({
         displayValue: this.state.displayValue += "*(",
-        parentheses: "open"})
+        parentheses: "open"});
 
     }else if( this.state.parentheses === "open" && !this.isValidOperation()){
       this.setState({
         displayValue: this.state.displayValue += ")",
         parentheses: "close"
-      })
+      });
     }
   }
 
@@ -105,16 +119,16 @@ export default class App extends Component {
         false
       }else{
         if(!!this.isValidOperation() ){
-          res = eval(this.state.displayValue)
+          res = eval(this.state.displayValue);
           if(isNaN(res)){
-          this.setState({displayValue: "error"})
+          this.setState({displayValue: "error"});
           }else{
             res += ""
             if(res.length > 9){
               let result = parseFloat(res)
-              this.setState({displayValue : result.toFixed(5)})
+              this.setState({displayValue : result.toFixed(5)});
             }else{
-              this.setState({displayValue : res})
+              this.setState({displayValue : res});
             }
           }
         }else{
@@ -127,14 +141,17 @@ export default class App extends Component {
   }
 
   isValidOperation = () => {
-    let invalidTermialString = ["*", "/", "(", "+", "-"]
+    let invalidTermialString = ["*", "/", "(", "+", "-", "."];
     if(invalidTermialString.includes(this.state.displayValue[this.state.displayValue.length - 1])){
-      return false
-    }else {
-      if(this.state.displayValue.includes("(") && !this.state.displayValue.includes(")")){
-        return false
-      }
+      return false;
+
+    }else if (this.state.displayValue[this.state.displayValue.length - 2] == "("){
       return true
+    }else {
+      if(this.state.displayValue.includes("(") && !this.state.displayValue.includes(")") ){
+        return false;
+      }
+      return true;
     }
   }
 
