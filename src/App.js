@@ -12,14 +12,16 @@ export default class App extends Component {
     displayValue: "0",
     displayHistory: "0",
     parentheses: "none",
-    operation: 0
+    operation: 0,
+    point: true
   }
 
   initialState = {
     displayValue: "0",
     displayHistory: "0",
     parentheses: "none",
-    operation: 0
+    operation: 0,
+    point: true 
   }
 
   addDig  = dig => {
@@ -30,14 +32,20 @@ export default class App extends Component {
         this.setState({displayValue: this.state.displayValue = dig})
       }else {
         if(dig == "." && this.state.displayValue.includes(dig) ){
-          if(this.isValidOperation() && this.state.operation > 0){
-            this.setState({displayValue: this.state.displayValue += dig})
+          if(this.isValidOperation() && this.state.point){
+            this.setState({
+              displayValue: this.state.displayValue += dig,
+              point: false
+            })
           }else{
             false
           }
-        }else if(dig == "." && !this.state.displayValue.includes(dig)){
+        }else if(dig == "." && this.state.point){
           if(this.isValidOperation()){
-            this.setState({displayValue: this.state.displayValue += dig})
+            this.setState({
+              displayValue: this.state.displayValue += dig,
+              point: false
+            })
           }else{
             false
           }
@@ -58,7 +66,7 @@ export default class App extends Component {
   }
 
   clearMemory = (dig) => {
-    
+    let especialOperation = ["*", "/", "(", "+", "-", ];
     if(dig === "del" ){
       if(this.state.displayValue.length < 2 && this.state.displayValue === "0") {
         return false;
@@ -68,12 +76,15 @@ export default class App extends Component {
         return false;
       }else{
         if(this.state.displayValue[this.state.displayValue.length - 1] == ")"){
-
           this.setState({
             displayValue: this.state.displayValue.slice(0, -1), 
             parentheses: "open"
           });
-
+        }else if(especialOperation.includes(this.state.displayValue[this.state.displayValue.length - 1])){
+            this.setState({
+              displayValue: this.state.displayValue.slice(0, -1), 
+              point: false
+            });
         }else {
           this.setState({displayValue: this.state.displayValue.slice(0, -1)});
         }
@@ -84,12 +95,12 @@ export default class App extends Component {
   }
 
   setOperation = digOperation => {
-    let invalidStartString = ["*", "/", "(", "+", "-", ];
+    
     if(this.state.displayValue == 'error' || this.state.displayValue == 'Infinity'){
       return false;
     }else{
       if(this.isValidOperation()){
-        this.setState({displayValue: this.state.displayValue += digOperation, operation: this.state.operation+= 1});
+        this.setState({displayValue: this.state.displayValue += digOperation, operation: this.state.point = true});
       }
       
     }
