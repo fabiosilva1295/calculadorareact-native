@@ -10,7 +10,7 @@ export default class App extends Component {
   
   state = {
     displayValue: "0",
-    displayHistory: "0",
+    displayHistory: "",
     parentheses: "none",
     operation: 0,
     point: true
@@ -18,7 +18,7 @@ export default class App extends Component {
 
   initialState = {
     displayValue: "0",
-    displayHistory: "0",
+    displayHistory: "",
     parentheses: "none",
     operation: 0,
     point: true 
@@ -142,9 +142,15 @@ export default class App extends Component {
             res += ""
             if(res.length > 9){
               let result = parseFloat(res)
-              this.setState({displayValue : result.toFixed(5)});
+              this.setState({
+                displayHistory: this.state.displayValue,
+                displayValue : result.toFixed(5)
+              });
             }else{
-              this.setState({displayValue : res});
+              this.setState({
+                displayHistory: this.state.displayValue,
+                displayValue : res
+              });
             }
           }
         }else{
@@ -183,7 +189,7 @@ export default class App extends Component {
     return (
       <SafeAreaView style={style.app}> 
         <View style={style.display}>
-          <Display value={this.state.displayValue}></Display>
+          <Display history={this.state.displayHistory} value={this.state.displayValue}></Display>
         </View>
         <View style={style.buttoncontainer}>
           <Button onClick={() => this.clearMemory()} ac label="AC"></Button>
